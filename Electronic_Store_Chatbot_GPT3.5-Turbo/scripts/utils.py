@@ -1,6 +1,8 @@
 import json
 import openai
 from collections import defaultdict
+import sys
+sys.path.append('../')
 
 # Getting credentials
 from Config import openaiConfig
@@ -8,7 +10,7 @@ openai.organization = openaiConfig.OPENAI_ORGANISATION
 openai.api_key = openaiConfig.OPENAI_API_KEY
 
 # Data File
-productsFile = 'data/products.json'
+productsFile = '../data/products.json'
 
 def getCompletionfromMessages(messages, 
                               model="gpt-3.5-turbo",
@@ -50,49 +52,8 @@ def findCategoryProductsOnly(userInput, productsByCategory):
     If a product is mentioned, it must be associated with the correct category in the allowed products list below.
     If no products or categories are found, output an empty list.
     
-    Allowed products:
-    Computers and Laptops:
-    TechPro Ultrabook
-    BlueWave Gaming Laptop
-    PowerLite Convertible
-    TechPro Desktop
-    BlueWave Chromebook
-
-    Smartphones and Accessories category:
-    SmartX ProPhone
-    MobiTech PowerCase
-    SmartX MiniPhone
-    MobiTech Wireless Charger
-    SmartX EarBuds
-
-    Televisions and Home Theater Systems category:
-    CineView 4K TV
-    SoundMax Home Theater
-    CineView 8K TV
-    SoundMax Soundbar
-    CineView OLED TV
-
-    Gaming Consoles and Accessories category:
-    GameSphere X
-    ProGamer Controller
-    GameSphere Y
-    ProGamer Racing Wheel
-    GameSphere VR Headset
-
-    Audio Equipment category:
-    AudioPhonic Noise-Canceling Headphones
-    WaveSound Bluetooth Speaker
-    AudioPhonic True Wireless Earbuds
-    WaveSound Soundbar
-    AudioPhonic Turntable
-
-    Cameras and Camcorders category:
-    FotoSnap DSLR Camera
-    ActionCam 4K
-    FotoSnap Mirrorless Camera
-    ZoomMaster Camcorder
-    FotoSnap Instant Camera
-
+    Allowed products: {productByCategory}
+    
     Only output the list of objects, nothing else.
     """
     
