@@ -108,3 +108,77 @@ def readString2List(inputString):
     except json.JSONDecodeError:
         print('Error: Invalid JSON string')
         return None
+    
+def getProductfromQuery(userMsg):
+    productnCategory = getProductnCategory()
+    delimiter = "####"
+    sysMessage = f"""
+    You will be provided with customer service queries. \
+    The customer service query will be delimited with {delimiter} characters.
+    Output a python list of json objects, where each object has the following format:
+        'category': <one of Computers and Laptops, Smartphones and Accessories, Televisions and Home Theater Systems, \
+    Gaming Consoles and Accessories, Audio Equipment, Cameras and Camcorders>,
+    OR
+        'products': <a list of products that must be found in the allowed products below>
+
+    Where the categories and products must be found in the customer service query.
+    If a product is mentioned, it must be associated with the correct category in the allowed products list below.
+    If no products or categories are found, output an empty list.
+
+    The allowed products are provided in JSON format.
+    The keys of each item represent the category.
+    The values of each item is a list of products that are within that category.
+    Allowed products: {productnCategory}
+
+    """
+    
+    messages =  [  
+    {'role':'system', 'content': sysMessage},    
+    {'role':'user', 'content': f"{delimiter}{userMsg}{delimiter}"},  
+    ] 
+    response = getCompletionfromMessages(messages)
+    
+    return response
+
+def getMentionedProductInfo(dataList):
+    productInfo = []
+    if dataList is None:
+        return []
+    for data in dataList:
+        try:
+            if "products" in data:
+                products = data["products"]
+                for pName in products:
+                    product = getProductbyName(pName)
+                    if product:
+                        productInfo.append(product)
+                    else:
+                        print(f"Product {pName} not found")
+            elif "category" in data:
+                cName = data['category']
+                cProducts = getProductbyCategory(cName)
+                for product in cProducts:
+                    productInfo.append(product)
+            else:
+                print("Error: Invalid object format")
+        except Exception as e:
+            print(f"Error: {e}")
+            
+    return productInfo
+
+def answerUserMsg(userMsg, productInfo):
+    delimiter = "####"
+    sysMessage = f"""
+    You are a customer service assistant for a large electronic store. \
+    Respond in a friendly and helpful tone, with concise answers. \
+    Make sure to ask the user relevant follow up questions.
+    """
+    
+    messages = [
+    {'role':'system', 'content':sysMessage},
+    {'role':'user', 'content':f'{delimiter}{userMsg}{delimiter}'},
+    {'role':'assistant', 'content':f"Relevant product information:\n{productInfo}"}
+    ]
+    response = getCompletionfromMessages(messages)
+    return response
+
